@@ -1,0 +1,22 @@
+{
+  "name": "todo-app-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "nodemon index.js",
+    "dev": "npm run server"
+  },
+  "author": "Viet Tran",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server-express": "^2.25.0",
+    "concurrently": "^6.2.0",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "graphql": "^15.5.0",
+    "mongoose": "^5.12.12"
+  },
+  "type":"module"
+
+}
