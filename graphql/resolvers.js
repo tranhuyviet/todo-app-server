@@ -4,15 +4,24 @@ export default {
     // QUERY
     Query: {
         // Get all todos
-        getTodos: async () => {
+        getTodos: async (_, { offset = 0, limit = 3 }) => {
             try {
-                const todos = await Todo.find();
+                console.log('OFFSET: ', offset, ' - LIMIT: ', limit);
+                const total = await Todo.find().countDocuments();
+                const hasMore = total - offset - limit > 0 ? true : false;
+                const todos = await Todo.find().limit(limit).skip(offset);
 
                 if (!todos) {
                     throw new Error('Can not get any todo');
                 }
 
-                return todos;
+                const returnTodos = {
+                    total,
+                    hasMore,
+                    todos,
+                };
+
+                return returnTodos;
             } catch (error) {
                 console.log(error);
             }

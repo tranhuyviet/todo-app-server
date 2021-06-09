@@ -7,8 +7,14 @@ export default gql`
         status: Boolean!
     }
 
+    type ReturnTodos {
+        total: Int!
+        hasMore: Boolean!
+        todos: [Todo]!
+    }
+
     type Query {
-        getTodos: [Todo!]!
+        getTodos(offset: Int, limit: Int): ReturnTodos!
     }
 
     type Mutation {
