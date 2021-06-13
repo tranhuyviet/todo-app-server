@@ -1,4 +1,7 @@
+import { UserInputError } from 'apollo-server-express';
 import Todo from '../models/todoModel.js';
+import User from '../models/userModel.js';
+import { registerSchema, validateErrors } from '../utils/validateSchema.js';
 
 export default {
     // QUERY
@@ -30,6 +33,49 @@ export default {
 
     // MUTATION
     Mutation: {
+        // USER
+        register: async (_, { email, password, confirmPassword }) => {
+            try {
+                // console.log({ email, password, confirmPassword });
+                let errors = {};
+                try {
+                    await registerSchema.validate(
+                        { email, password, confirmPassword },
+                        { abortEarly: false }
+                    );
+                } catch (error) {
+                    errors = validateErrors(error);
+
+                    throw new UserInputError('REGISTER ERROR - VALIDATE', {
+                        errors,
+                    });
+                }
+
+                // CHECK EMAIL IS EXIST
+                const userExist = await User.findOne({ email });
+                if (userExist) {
+                    errors.email = 'This email is already taken';
+                    throw new UserInputError('SIGNUP ERROR - EMAIL EXIST', {
+                        errors,
+                    });
+                }
+
+                // CREATE NEW USER
+                const user = new User({
+                    email,
+                });
+
+                // HASH PASSWORD
+                user.hashPassword(password);
+                await user.save();
+
+                // RETURN USER
+                return user.returnAuthUser();
+            } catch (error) {
+                return error;
+            }
+        },
+        // TODO
         // add todo
         addTodo: async (_, { title }) => {
             try {
