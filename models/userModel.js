@@ -22,6 +22,11 @@ userSchema.methods.hashPassword = function hashPassword(password) {
     this.password = bcrypt.hashSync(password, 12);
 };
 
+// check password login
+userSchema.methods.isValidPassword = function isValidPassword(password) {
+    return bcrypt.compareSync(password, this.password);
+};
+
 // generate token
 userSchema.methods.generateJWT = function generateJWT() {
     return jwt.sign(

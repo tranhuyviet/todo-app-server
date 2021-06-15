@@ -21,6 +21,7 @@ export default gql`
 
     type Query {
         getTodos(offset: Int, limit: Int): ReturnTodos!
+        login(email: String!, password: String): User!
     }
 
     type Mutation {

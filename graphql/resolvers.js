@@ -1,11 +1,51 @@
 import { UserInputError } from 'apollo-server-express';
 import Todo from '../models/todoModel.js';
 import User from '../models/userModel.js';
-import { registerSchema, validateErrors } from '../utils/validateSchema.js';
+import {
+    registerSchema,
+    loginSchema,
+    validateErrors,
+} from '../utils/validateSchema.js';
 
 export default {
     // QUERY
     Query: {
+        // USER
+        login: async (_, { email, password }) => {
+            try {
+                // VALIDATE INPUT
+                console.log({ email, password });
+                let errors = {};
+                try {
+                    await loginSchema.validate(
+                        { email, password },
+                        { abortEarly: false }
+                    );
+                } catch (error) {
+                    errors = validateErrors(error);
+
+                    throw new UserInputError('REGISTER ERROR - VALIDATE', {
+                        errors,
+                    });
+                }
+
+                const user = await User.findOne({ email });
+
+                // CHECK EMAIL AND CORRECT PASSWORD
+                if (!user || !user.isValidPassword(password)) {
+                    errors.global = 'Invalid credentials';
+                    throw new UserInputError(
+                        'LOGIN ERROR - INVALID CREDENTIALS',
+                        { errors }
+                    );
+                }
+
+                return user.returnAuthUser();
+            } catch (error) {
+                return error;
+            }
+        },
+        // TODO
         // Get all todos
         getTodos: async (_, { offset = 0, limit = 3 }) => {
             try {
@@ -36,7 +76,8 @@ export default {
         // USER
         register: async (_, { email, password, confirmPassword }) => {
             try {
-                // console.log({ email, password, confirmPassword });
+                // VALIDATE INPUT
+                console.log({ email, password, confirmPassword });
                 let errors = {};
                 try {
                     await registerSchema.validate(
