@@ -69,6 +69,23 @@ export default {
                 console.log(error);
             }
         },
+
+        // GET TODO BY ID
+        getTodo: async (_, { _id }) => {
+            try {
+                const todo = await Todo.findById(_id);
+
+                if (!todo) {
+                    throw new UserInputError(
+                        'GET TODO BY ID ERROR - ID INPUT IS NOT CORRECT'
+                    );
+                }
+
+                return todo;
+            } catch (error) {
+                return error;
+            }
+        },
     },
 
     // MUTATION
